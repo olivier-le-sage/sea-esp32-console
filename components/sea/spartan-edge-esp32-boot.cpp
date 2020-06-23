@@ -139,7 +139,8 @@ int spartan_edge_esp32_boot::xlibsSstream(const char* path) {
   }
 
   /* read data from bitstream */
-  byte_len = fread(byte_buff, READ_SIZE, 1, fp);
+  byte_len = fread(&byte_buff, READ_SIZE, 1, fp);
+
 
   // find the raw bits
   if(byte_buff[0] != 0xff)
@@ -154,9 +155,10 @@ int spartan_edge_esp32_boot::xlibsSstream(const char* path) {
         i += (byte_buff[i+1]<<8 | byte_buff[i+2]) + 3;
         // exit if the next record isn't within the buffer
         if(i>= byte_len)
+            ESP_LOGE(TAG, "DEV ERROR: Next record not within byte buffer.");
             return -1;
     }
-    // skip the field name and bitstrem length
+    // skip the field name and bitstream length
     i += 5;
   } // else it's already a raw bin file
 
@@ -181,7 +183,7 @@ int spartan_edge_esp32_boot::xlibsSstream(const char* path) {
       }
     }
     // byte_len = file.read(byte_buff, READ_SIZE); // Arduino
-    byte_len = fread(byte_buff, READ_SIZE, 1, fp);
+    byte_len = fread(&byte_buff, READ_SIZE, 1, fp);
     i = 0;
   }
   gpio_set_level(XFPGA_CCLK_PIN, LOW);

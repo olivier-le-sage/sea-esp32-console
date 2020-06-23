@@ -53,17 +53,21 @@ static int load_bitstream(int argc, char *argv[]) {
 
     // XFPGA pin Initialize
     esp32Cla.xfpgaGPIOInit();
+    ESP_LOGI(TAG, "Initialized XFPGA pins.");
 
     if (load_bitstream_args.filename->count == 1) {
 
         // load the bitstream onto the FPGA
         char temp[256];
         snprintf(temp, sizeof(temp), "%s%s", OVERLAY_FOLDER, load_bitstream_args.filename->sval[0]);
+        ESP_LOGI(TAG, "Loading %s bitstream.", temp);
         esp32Cla.xlibsSstream(temp);
     } else {
         // load the default bitstream onto the FPGA
+        ESP_LOGI(TAG, "Loading default bitstream %s.", DEFAULT_FILE);
         esp32Cla.xlibsSstream(DEFAULT_FILE);
     }
+    esp32Cla.end(); // unmount the SD card
     return 0;
 }
 
