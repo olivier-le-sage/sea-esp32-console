@@ -10,7 +10,7 @@ I'll be adding more commands as I need them.
 
 - ESP IDF and its requirements
 - SEA board by Seeedstudio
-- a FAT32-formatted SD card with your bitstream files put in the /overlay/ folder.
+- A FAT-formatted SD card with your bitstream files put in the /overlay/ folder. Keep in mind that this means the bitstream files have to stick to 8:3 file naming convention.
 - PuTTY (or other terminal application)
 - NB: Originally compiled on windows
 
