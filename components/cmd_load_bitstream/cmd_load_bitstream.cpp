@@ -61,11 +61,16 @@ static int load_bitstream(int argc, char *argv[]) {
         char temp[256];
         snprintf(temp, sizeof(temp), "%s%s", OVERLAY_FOLDER, load_bitstream_args.filename->sval[0]);
         ESP_LOGI(TAG, "Loading %s bitstream.", temp);
-        esp32Cla.xlibsSstream(temp);
+        if (0 != esp32Cla.xlibsSstream(temp)) {
+            ESP_LOGE(TAG, "Failed to load bitstream.");
+        }
     } else {
         // load the default bitstream onto the FPGA
         ESP_LOGI(TAG, "Loading default bitstream %s.", DEFAULT_FILE);
-        esp32Cla.xlibsSstream(DEFAULT_FILE);
+        if (0 != esp32Cla.xlibsSstream(DEFAULT_FILE)) {
+            ESP_LOGE(TAG, "Failed to load default bitstream.");
+        }
+
     }
     esp32Cla.end(); // unmount the SD card
     return 0;

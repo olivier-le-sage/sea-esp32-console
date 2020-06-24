@@ -1,6 +1,7 @@
 /* Spartan Edge Accelerator board library for loading bitstreams to the FPGA */
 /* Modified by: Olivier Lesage */
 
+#include <dirent.h>
 #include "spartan-edge-esp32-boot.h"
 #include "esp_vfs_fat.h"
 #include "driver/sdmmc_host.h"
@@ -121,26 +122,34 @@ void spartan_edge_esp32_boot::xfpgaGPIOInit(void) {
 
 // loading the FPGA LOGIC
 int spartan_edge_esp32_boot::xlibsSstream(const char* path) {
-  unsigned char byte_buff[1024];
+  unsigned char byte_buff[1024] = {0};
   int byte_len;
   unsigned byte;
   int i = 0;
   int j = 0;
 
   // open the file using C standard library functions
-  // File file = SD_MMC.open(path);
   char full_path[256];
   snprintf(full_path, sizeof(full_path), "/sdcard%s", path);
-  FILE* fp = fopen(full_path, "rb");
+  FILE* fp = fopen(full_path, "rb"); // bitstream requires binary mode
 
   if(!fp) {
-      ESP_LOGE(TAG, "Failed to open file %s. Please check that the file exists.", full_path);
+    ESP_LOGE(TAG, "Failed to open file %s. Please check that the file exists.", full_path);
+
+    // list files in overlay directory
+    struct dirent *de; // directory pointer
+    DIR* dr = opendir("/sdcard/overlay/");
+    if (!dr) {
+        ESP_LOGE(TAG, "Couldn't open /overlay/ directory.");
+        return -1;
+    }
+    ESP_LOGE(TAG, "Valid options found in /overlay/ are:");
+    while ((de = readdir(dr)) != NULL) ESP_LOGE(TAG, "%s", de->d_name);
     return -1;
   }
 
   /* read data from bitstream */
-  byte_len = fread(&byte_buff, READ_SIZE, 1, fp);
-
+  byte_len = fread(byte_buff, sizeof(char), READ_SIZE, fp);
 
   // find the raw bits
   if(byte_buff[0] != 0xff)
@@ -154,9 +163,10 @@ int spartan_edge_esp32_boot::xlibsSstream(const char* path) {
         // skip the record
         i += (byte_buff[i+1]<<8 | byte_buff[i+2]) + 3;
         // exit if the next record isn't within the buffer
-        if(i>= byte_len)
+        if(i>= byte_len) {
             ESP_LOGE(TAG, "DEV ERROR: Next record not within byte buffer.");
             return -1;
+        }
     }
     // skip the field name and bitstream length
     i += 5;
@@ -164,14 +174,25 @@ int spartan_edge_esp32_boot::xlibsSstream(const char* path) {
 
   /* put pins down for Configuration */
   gpio_set_direction(XFPGA_DIN_PIN, GPIO_MODE_OUTPUT);
-  // pinMode(XFPGA_DIN_PIN, OUTPUT);
 
    /*
    * loading the bitstream
    * If you want to know the details,you can Refer to the following documentation
    * https://www.xilinx.com/support/documentation/user_guides/ug470_7Series_Config.pdf
    */
+  int k = 0;
+  int dot_num = 1;
   while ((byte_len != 0)&&(byte_len != -1)) {
+
+    // update a status message every 5 writes to show write is in progress
+    if (k==0) {
+        if (dot_num == 1) printf("\rWriting.   ");
+        else if (dot_num == 2) printf("\rWriting..  ");
+        else if (dot_num == 3) printf("\rWriting... ");
+        else if (dot_num == 4) printf("\rWriting....");
+        dot_num =  dot_num % 4 + 1; // 1,2,3,4,1,2,3,4...
+    }
+
     for ( ;i < byte_len;i++) {
       byte = byte_buff[i];
 
@@ -183,9 +204,11 @@ int spartan_edge_esp32_boot::xlibsSstream(const char* path) {
       }
     }
     // byte_len = file.read(byte_buff, READ_SIZE); // Arduino
-    byte_len = fread(&byte_buff, READ_SIZE, 1, fp);
+    byte_len = fread(byte_buff, sizeof(char), READ_SIZE, fp);
     i = 0;
+    k = (k+1)%15;
   }
+  printf("\n");
   gpio_set_level(XFPGA_CCLK_PIN, LOW);
 
   if(byte_len == -1) ESP_LOGE(TAG, "bitstream read error");
