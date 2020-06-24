@@ -138,13 +138,13 @@ int spartan_edge_esp32_boot::xlibsSstream(const char* path) {
 
     // list files in overlay directory
     struct dirent *de; // directory pointer
-    DIR* dr = opendir("/sdcard/overlay/");
+    DIR* dr = opendir("/sdcard/overlay");
     if (!dr) {
         ESP_LOGE(TAG, "Couldn't open /overlay/ directory.");
         return -1;
     }
     ESP_LOGE(TAG, "Valid options found in /overlay/ are:");
-    while ((de = readdir(dr)) != NULL) ESP_LOGE(TAG, "%s", de->d_name);
+    while ((de = readdir(dr)) != NULL) ESP_LOGI(TAG, "%s", de->d_name);
     return -1;
   }
 
