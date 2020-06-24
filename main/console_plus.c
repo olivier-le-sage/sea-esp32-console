@@ -131,6 +131,7 @@ void app_main()
     esp_console_register_help_command();
     register_system();
     register_wifi();
+    register_scan();
     register_nvs();
     register_load_bitstream();
 

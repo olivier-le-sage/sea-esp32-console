@@ -1,8 +1,11 @@
-#### ESP32 Console for the Spartan Edge Accelerator
+## A Console for the Spartan Edge Accelerator
 
 ### Raison d'être
 
-Espressif provides a barebones console application for ESP32 platforms which exposes some basic memory partitioning commands, wifi connectivity, FreeRTOS task commands, and system functions. To these I've added my own command (for the sake of convenience) which is capable of mounting the SD card, loading a bitstream, and programming the on-board Spartan-7 Xilinx FPGA.
+Espressif provides a barebones console application for ESP32 platforms which exposes some basic memory partitioning commands, wifi connectivity, FreeRTOS task commands, and system functions. To these I've added my own commands (for the sake of convenience) which are capable of:
+
+- mounting the SD card, loading a bitstream, and programming the on-board Spartan-7 Xilinx FPGA.
+- scanning for nearby WiFi APs and printing their info.
 
 I'll be adding more commands as I need them.
 

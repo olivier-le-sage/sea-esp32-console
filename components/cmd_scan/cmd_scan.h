@@ -12,6 +12,8 @@
 extern "C" {
 #endif
 
+#define DEFAULT_SCAN_LIST_SIZE 15
+
 void register_scan();
 
 #ifdef __cplusplus

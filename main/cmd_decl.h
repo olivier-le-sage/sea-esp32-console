@@ -16,7 +16,7 @@ extern "C" {
 #include "cmd_wifi.h"
 #include "cmd_nvs.h"
 #include "cmd_load_bitstream.h"
-// #include "cmd_scan.h"
+#include "cmd_scan.h"
 
 #ifdef __cplusplus
 }

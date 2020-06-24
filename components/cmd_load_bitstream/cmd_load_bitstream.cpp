@@ -70,7 +70,6 @@ static int load_bitstream(int argc, char *argv[]) {
         if (0 != esp32Cla.xlibsSstream(DEFAULT_FILE)) {
             ESP_LOGE(TAG, "Failed to load default bitstream.");
         }
-
     }
     esp32Cla.end(); // unmount the SD card
     return 0;
