@@ -178,11 +178,13 @@ static int scan(int argc, char* argv[]) {
         if (scan_done == true) {
             display_scan_result();
             scan_done = false;
+            break;
         } else {
             vTaskDelay(100 / portTICK_RATE_MS);
             continue;
         }
     }
+    return 0;
 }
 
 void register_scan() {
